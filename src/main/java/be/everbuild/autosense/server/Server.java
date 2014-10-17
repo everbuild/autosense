@@ -1,8 +1,6 @@
 package be.everbuild.autosense.server;
 
 import be.everbuild.autosense.Slf4jLogReceiver;
-import be.everbuild.autosense.identity.Role;
-import be.everbuild.autosense.identity.SimpleIdentityManager;
 import be.everbuild.autosense.server.rest.RestApiBuilder;
 import be.everbuild.autosense.server.ws.WebsocketApiBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,6 +43,14 @@ public class Server {
     public void start() {
         undertow.start();
         LOG.info("Server started");
+        // TODO why don't the shutdown hooks work???
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                LOG.info("Stopping Undertow");
+                undertow.stop();
+            }
+        });
     }
 
     private HttpHandler initHandlers() {
