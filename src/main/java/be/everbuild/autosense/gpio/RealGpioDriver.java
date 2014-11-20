@@ -1,5 +1,7 @@
 package be.everbuild.autosense.gpio;
 
+import com.pi4j.gpio.extension.mcp.MCP23017GpioProvider;
+import com.pi4j.gpio.extension.mcp.MCP23017Pin;
 import com.pi4j.io.gpio.*;
 import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
@@ -17,6 +19,31 @@ public class RealGpioDriver implements GpioDriver {
         // create gpio controller instance
         final GpioController gpio = GpioFactory.getInstance();
 
+        //testOnboardGpio(gpio);
+        //testExternalGpio(gpio);
+
+        final GpioPinDigitalInput shutdownButton = gpio.provisionDigitalInputPin(RaspiPin.GPIO_04,             // PIN NUMBER
+                "shutdownButton",                   // PIN FRIENDLY NAME (optional)
+                PinPullResistance.PULL_DOWN); // PIN RESISTANCE (optional)
+        shutdownButton.addListener(new GpioPinListenerDigital() {
+            @Override
+            public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
+                if (event.getState() == PinState.LOW) {
+                    poweroff();
+                }
+            }
+        });
+
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                LOG.info("Stopping GPIO");
+                gpio.shutdown();
+            }
+        });
+    }
+
+    private void testOnboardGpio(GpioController gpio) {
         // provision gpio pin #02 as an input pin with its internal pull down resistor enabled
         // (configure pin edge to both rising and falling to get notified for HIGH and LOW state
         // changes)
@@ -40,27 +67,42 @@ public class RealGpioDriver implements GpioDriver {
                 updateLed(myButton, myLed);
             }
         });
+    }
 
-        final GpioPinDigitalInput shutdownButton = gpio.provisionDigitalInputPin(RaspiPin.GPIO_04,             // PIN NUMBER
-                "shutdownButton",                   // PIN FRIENDLY NAME (optional)
-                PinPullResistance.PULL_DOWN); // PIN RESISTANCE (optional)
-        shutdownButton.addListener(new GpioPinListenerDigital() {
-            @Override
-            public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
-                if(event.getState() == PinState.LOW) {
-                    poweroff();
+    private void testExternalGpio(GpioController gpio) {
+        try {
+            // address composition: 0 1 0 0 A2 A1 A0
+            // bus is always 1 it seems
+            MCP23017GpioProvider mcp23017GpioProvider = new MCP23017GpioProvider(1, 0x20);
+
+            // output
+            GpioPinDigitalOutput extOut1 = gpio.provisionDigitalOutputPin(mcp23017GpioProvider, MCP23017Pin.GPIO_A1, "extOut1", PinState.LOW);
+            extOut1.blink(500);
+
+            // input
+            final GpioPinDigitalInput extInp1 = gpio.provisionDigitalInputPin(mcp23017GpioProvider, MCP23017Pin.GPIO_A2, "extInp1", PinPullResistance.PULL_UP);
+            extInp1.addListener(new GpioPinListenerDigital() {
+                @Override
+                public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
+                    // display pin state on console
+                    LOG.info(" --> GPIO PIN STATE CHANGE: {} = {}", event.getPin().getName(), event.getState().getName());
                 }
-            }
-        });
+            });
 
-        // TODO why don't the shutdown hooks work???
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                LOG.info("Stopping GPIO");
-                gpio.shutdown();
-            }
-        });
+            final GpioPinDigitalInput mcpInterrupt = gpio.provisionDigitalInputPin(RaspiPin.GPIO_15, "MCP Interrupt", PinPullResistance.PULL_UP);
+            // interrupt line is active low: a transition from LOW (and immediately back to HIGH) signals an interrupt
+            mcpInterrupt.addListener(new GpioPinListenerDigital() {
+                @Override
+                public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
+                    if(event.getState() == PinState.LOW) {
+                        LOG.info(" --> GPIO INTERRUPT");
+                    }
+                }
+            });
+
+        } catch (IOException e) {
+            LOG.error("Can't do it", e);
+        }
     }
 
     private void updateLed(GpioPinDigitalInput myButton, GpioPinDigitalOutput myLed) {
