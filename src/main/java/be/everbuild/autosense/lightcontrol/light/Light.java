@@ -1,9 +1,14 @@
 package be.everbuild.autosense.lightcontrol.light;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashSet;
 import java.util.Set;
 
 public class Light {
+    private static final Logger LOG = LoggerFactory.getLogger(Light.class);
+
     private final String name;
     private boolean on = false;
     private final Set<LightListener> listeners = new HashSet<>();
@@ -23,6 +28,7 @@ public class Light {
             for (LightListener listener : listeners) {
                 listener.handleLightOn(event);
             }
+            LOG.info("Light {} turned on", name);
         }
     }
 
@@ -33,6 +39,7 @@ public class Light {
             for (LightListener listener : listeners) {
                 listener.handleLightOff(event);
             }
+            LOG.info("Light {} turned off", name);
         }
     }
 
@@ -46,6 +53,10 @@ public class Light {
 
     public boolean isOn() {
         return on;
+    }
+
+    public boolean isOff() {
+        return !on;
     }
 
     public Light addListener(LightListener listener) {

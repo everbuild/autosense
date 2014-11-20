@@ -1,5 +1,8 @@
 package be.everbuild.autosense.lightcontrol.button;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
@@ -7,6 +10,8 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class Button {
+    private static final Logger LOG = LoggerFactory.getLogger(Button.class);
+
     private final String name;
     private final long maxPressDuration;
     private final ScheduledExecutorService executorService;
@@ -31,6 +36,7 @@ public class Button {
 
     public void press() {
         if(!pressed) {
+            LOG.info("Button {} pressed", name);
             pressed = true;
             ButtonPressEvent event = new ButtonPressEvent(this, System.currentTimeMillis());
             for (ButtonListener listener : listeners) {
@@ -47,6 +53,7 @@ public class Button {
 
     public void release() {
         if(pressed) {
+            LOG.info("Button {} released", name);
             pressed = false;
             ButtonReleaseEvent event = new ButtonReleaseEvent(this, System.currentTimeMillis());
             for (ButtonListener listener : listeners) {

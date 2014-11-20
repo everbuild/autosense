@@ -40,6 +40,7 @@ public class LightControlModule {
     private final Button[] buttons = new Button[8];
     private final Light[] lights = new Light[8];
     private boolean ready = false;
+    private int currentOutputValue;
 
     public LightControlModule(final int busNumber, final int address, final ScheduledExecutorService executorService) {
         this.busNumber = busNumber;
@@ -72,6 +73,7 @@ public class LightControlModule {
         } catch (Exception e) {
             LOG.error("invalid pin", e);
         }
+        syncLights();
         return this;
     }
 
@@ -120,8 +122,10 @@ public class LightControlModule {
         // read interrupt capture register of port A to clear it
         device.read(INTCAPA);
 
-        // set all pins of port B to low by default
-        device.write(GPIOB, (byte) 0x00);
+        // get current state of port B pins
+        currentOutputValue = device.read(GPIOB);
+
+        syncLights();
 
         // output all register state
         if (LOG.isDebugEnabled()) {
@@ -137,6 +141,11 @@ public class LightControlModule {
         int flag = device.read(INTFA);
         if(flag > 0) {
             LOG.debug("interrupt flag = {}", Integer.toBinaryString(flag));
+            try {
+                // sleep a bit to debounce button press (a single physical press might be seen as a short burst of pulses due too spring loading and such)
+                Thread.sleep(100); // TODO this value may need some tweaking depending on real-world conditions
+            } catch (InterruptedException e) {
+            }
             int capturedValue = device.read(INTCAPA);
 
             for(int pin = 0; pin < 8; pin ++) {
@@ -166,7 +175,25 @@ public class LightControlModule {
             }
         }
 
-        device.write(GPIOB, (byte) value);
+        if (currentOutputValue != value) {
+            LOG.debug("setting port B to {}", Integer.toBinaryString(value));
+            device.write(GPIOB, (byte) value);
+            currentOutputValue = value;
+        }
+    }
+
+    private void syncLights() {
+        for(int pin = 0; pin < 8; pin ++) {
+            Light light = lights[pin];
+            if(light != null) {
+                boolean actuallyOn = (currentOutputValue & (1 << pin)) > 0;
+                if(light.isOff() && actuallyOn) {
+                    light.turnOn();
+                } else if(light.isOn() && !actuallyOn) {
+                    light.turnOff();
+                }
+            }
+        }
     }
 
     private void runSetupTask() {
@@ -178,7 +205,8 @@ public class LightControlModule {
     }
 
     private void startUpdateTask() {
-        updateTaskFuture = executorService.scheduleAtFixedRate(updateTask, 0, 100, TimeUnit.MILLISECONDS);
+        // TODO the delay value may need some tweaking depending on real-world conditions
+        updateTaskFuture = executorService.scheduleWithFixedDelay(updateTask, 0, 50, TimeUnit.MILLISECONDS);
     }
 
     private boolean stopUpdateTask() {
