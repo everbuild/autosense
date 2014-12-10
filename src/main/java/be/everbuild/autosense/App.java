@@ -20,10 +20,19 @@ public class App {
         GpioDriverFactory.create(driverName);
 
         ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-        ExampleConfiguration configuration = new ExampleConfiguration(executorService);
+        // TODO fix driver stuff
+//        ExampleConfiguration configuration = new ExampleConfiguration(executorService);
+//
+//        if("real".equals(driverName)) {
+//            LightControlModule lightControlModule = new LightControlModule(1, 0x20, executorService);
+//            configuration.bindModule(lightControlModule);
+//        }
 
-        if("real".equals(driverName)) {
-            LightControlModule lightControlModule = new LightControlModule(1, 0x20, executorService);
+        String testAddr = System.getProperty("test");
+        if(testAddr != null) {
+            TestConfiguration configuration = new TestConfiguration(executorService);
+            int addr = Integer.parseInt(testAddr, 2) + 0x20;
+            LightControlModule lightControlModule = new LightControlModule(1, addr, executorService);
             configuration.bindModule(lightControlModule);
         }
     }
