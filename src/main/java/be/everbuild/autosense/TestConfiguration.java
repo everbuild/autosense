@@ -18,7 +18,7 @@ public class TestConfiguration {
         for(int i = 0; i < 8; i ++) {
             buttons[i] = buttonFactory.createButton("button " + i);
             lights[i] = new Light("light " + i);
-            buttons[i].addListener(new SingleLightController(lights[i]));
+            buttons[i].addListener(new SingleLightToggleController(lights[i]));
         }
     }
 
@@ -29,21 +29,20 @@ public class TestConfiguration {
         }
     }
 
-    private static class SingleLightController implements ButtonListener {
+    private static class SingleLightToggleController implements ButtonListener {
         private final Light light;
 
-        private SingleLightController(Light light) {
+        private SingleLightToggleController(Light light) {
             this.light = light;
         }
 
         @Override
         public void handleButtonPress(ButtonPressEvent event) {
-            light.turnOn();
+            light.toggle();
         }
 
         @Override
         public void handleButtonRelease(ButtonReleaseEvent event) {
-            light.turnOff();
         }
     }
 }

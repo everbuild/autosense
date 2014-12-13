@@ -12,7 +12,7 @@ import java.util.concurrent.ScheduledExecutorService;
 public class App {
     public static void main(String[] args) throws Exception {
         startGpio();
-        startServer();
+        //startServer();
     }
 
     private static void startGpio() {
