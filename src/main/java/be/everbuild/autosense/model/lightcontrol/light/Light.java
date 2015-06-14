@@ -1,4 +1,4 @@
-package be.everbuild.autosense.lightcontrol.light;
+package be.everbuild.autosense.model.lightcontrol.light;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,12 +9,18 @@ import java.util.Set;
 public class Light {
     private static final Logger LOG = LoggerFactory.getLogger(Light.class);
 
+    private final String id;
     private final String name;
     private boolean on = false;
     private final Set<LightListener> listeners = new HashSet<>();
 
-    public Light(String name) {
+    public Light(String id, String name) {
+        this.id = id;
         this.name = name;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getName() {

@@ -1,5 +1,7 @@
-package be.everbuild.autosense.gpio;
+package be.everbuild.autosense.gpio.real;
 
+import be.everbuild.autosense.gpio.GpioDriver;
+import be.everbuild.autosense.model.lightcontrol.LightControlModule;
 import com.pi4j.gpio.extension.mcp.MCP23017GpioProvider;
 import com.pi4j.gpio.extension.mcp.MCP23017Pin;
 import com.pi4j.io.gpio.*;
@@ -9,12 +11,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class RealGpioDriver implements GpioDriver {
     private static final Logger LOG = LoggerFactory.getLogger(RealGpioDriver.class);
 
-    public RealGpioDriver() {
+    private final ScheduledExecutorService executorService;
+
+    public RealGpioDriver(ScheduledExecutorService executorService) {
         // Mostly experiments for now
+
+        this.executorService = executorService;
 
         // create gpio controller instance
         final GpioController gpio = GpioFactory.getInstance();
@@ -120,5 +127,10 @@ public class RealGpioDriver implements GpioDriver {
         } catch (IOException e) {
             LOG.error("Can't shutdown", e);
         }
+    }
+
+    @Override
+    public LightControlModule createLightControlModule(String id, int busNumber, int address) {
+        return new GpioLightControlModule(id, busNumber, address, executorService);
     }
 }

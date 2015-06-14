@@ -1,4 +1,4 @@
-package be.everbuild.autosense.lightcontrol.button;
+package be.everbuild.autosense.model.lightcontrol.button;
 
 import java.util.EventObject;
 

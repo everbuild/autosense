@@ -1,4 +1,4 @@
-package be.everbuild.autosense.lightcontrol.light;
+package be.everbuild.autosense.model.lightcontrol.light;
 
 import java.util.EventListener;
 

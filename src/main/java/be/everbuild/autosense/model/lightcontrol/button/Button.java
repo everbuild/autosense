@@ -1,4 +1,4 @@
-package be.everbuild.autosense.lightcontrol.button;
+package be.everbuild.autosense.model.lightcontrol.button;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 public class Button {
     private static final Logger LOG = LoggerFactory.getLogger(Button.class);
 
+    private final String id;
     private final String name;
     private final long maxPressDuration;
     private final ScheduledExecutorService executorService;
@@ -20,10 +21,15 @@ public class Button {
     private final Runnable autoReleaseTask = new AutoReleaseTask() ;
     private ScheduledFuture<?> autoReleaseFuture;
 
-    public Button(String name, long maxPressDuration, ScheduledExecutorService executorService) {
+    public Button(String id, String name, long maxPressDuration, ScheduledExecutorService executorService) {
+        this.id = id;
         this.name = name;
         this.maxPressDuration = maxPressDuration;
         this.executorService = executorService;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getName() {
