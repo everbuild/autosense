@@ -1,8 +1,9 @@
-package be.everbuild.autosense.model.lightcontrol;
+package be.everbuild.autosense.gpio.impl.shared;
 
 import be.everbuild.autosense.gpio.GpioAddress;
-import be.everbuild.autosense.model.lightcontrol.button.Button;
-import be.everbuild.autosense.model.lightcontrol.light.Light;
+import be.everbuild.autosense.gpio.LightControlModule;
+import be.everbuild.autosense.model.button.Button;
+import be.everbuild.autosense.model.light.Light;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

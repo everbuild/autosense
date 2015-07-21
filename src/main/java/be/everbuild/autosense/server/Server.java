@@ -1,6 +1,6 @@
 package be.everbuild.autosense.server;
 
-import be.everbuild.autosense.Slf4jLogReceiver;
+import be.everbuild.autosense.server.log.Slf4jLogReceiver;
 import be.everbuild.autosense.server.rest.RestApiBuilder;
 import be.everbuild.autosense.server.ws.WebsocketApiBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;

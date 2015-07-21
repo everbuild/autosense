@@ -1,9 +1,8 @@
-package be.everbuild.autosense.gpio.real;
+package be.everbuild.autosense.gpio.impl.real;
 
-import be.everbuild.autosense.AutomationContext;
 import be.everbuild.autosense.gpio.GpioAddress;
 import be.everbuild.autosense.gpio.GpioDriver;
-import be.everbuild.autosense.model.lightcontrol.LightControlModule;
+import be.everbuild.autosense.gpio.LightControlModule;
 import com.pi4j.gpio.extension.mcp.MCP23017GpioProvider;
 import com.pi4j.gpio.extension.mcp.MCP23017Pin;
 import com.pi4j.io.gpio.*;
@@ -131,6 +130,6 @@ public class RealGpioDriver extends GpioDriver {
 
     @Override
     public LightControlModule createLightControlModule(GpioAddress address, ScheduledExecutorService executorService) {
-        return new GpioLightControlModule(address, executorService);
+        return new RealLightControlModule(address, executorService);
     }
 }

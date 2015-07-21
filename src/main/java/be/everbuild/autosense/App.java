@@ -1,5 +1,7 @@
 package be.everbuild.autosense;
 
+import be.everbuild.autosense.config.JavaScriptConfigurator;
+import be.everbuild.autosense.context.AutomationContext;
 import be.everbuild.autosense.gpio.GpioDriver;
 import be.everbuild.autosense.identity.Role;
 import be.everbuild.autosense.identity.SimpleIdentityManager;
@@ -17,7 +19,7 @@ public class App {
     public static void main(String[] args) throws Exception {
         GpioDriver gpioDriver = GpioDriver.create();
         AutomationContext context = new AutomationContext(gpioDriver);
-        Configurator configurator = new Configurator(context);
+        JavaScriptConfigurator configurator = new JavaScriptConfigurator(context);
         //startServer();
     }
 

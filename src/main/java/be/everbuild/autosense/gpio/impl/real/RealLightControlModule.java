@@ -1,9 +1,9 @@
-package be.everbuild.autosense.gpio.real;
+package be.everbuild.autosense.gpio.impl.real;
 
 import be.everbuild.autosense.gpio.GpioAddress;
-import be.everbuild.autosense.model.lightcontrol.BasicLightControlModule;
-import be.everbuild.autosense.model.lightcontrol.button.Button;
-import be.everbuild.autosense.model.lightcontrol.light.Light;
+import be.everbuild.autosense.gpio.impl.shared.BasicLightControlModule;
+import be.everbuild.autosense.model.button.Button;
+import be.everbuild.autosense.model.light.Light;
 import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CDevice;
 import com.pi4j.io.i2c.I2CFactory;
@@ -15,8 +15,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-public class GpioLightControlModule extends BasicLightControlModule {
-    private static final Logger LOG = LoggerFactory.getLogger(GpioLightControlModule.class);
+public class RealLightControlModule extends BasicLightControlModule {
+    private static final Logger LOG = LoggerFactory.getLogger(RealLightControlModule.class);
 
     private I2CBus bus;
     private I2CDevice device;
@@ -40,7 +40,7 @@ public class GpioLightControlModule extends BasicLightControlModule {
     private boolean ready = false;
     private int currentOutputValue;
 
-    public GpioLightControlModule(GpioAddress address, ScheduledExecutorService executorService) {
+    public RealLightControlModule(GpioAddress address, ScheduledExecutorService executorService) {
         super(address);
         this.executorService = executorService;
         runSetupTask();

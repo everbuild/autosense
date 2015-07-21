@@ -1,8 +1,7 @@
 package be.everbuild.autosense.gpio;
 
-import be.everbuild.autosense.gpio.dummy.DummyGpioDriver;
-import be.everbuild.autosense.gpio.real.RealGpioDriver;
-import be.everbuild.autosense.model.lightcontrol.LightControlModule;
+import be.everbuild.autosense.gpio.impl.dummy.DummyGpioDriver;
+import be.everbuild.autosense.gpio.impl.real.RealGpioDriver;
 
 import java.util.concurrent.ScheduledExecutorService;
 

@@ -1,17 +1,18 @@
-package be.everbuild.autosense.model.lightcontrol.light;
+package be.everbuild.autosense.model.light;
 
+import be.everbuild.autosense.model.EventSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.function.Consumer;
 
 public class Light {
     private static final Logger LOG = LoggerFactory.getLogger(Light.class);
 
     private final String name;
     private boolean on = false;
-    private final Set<LightListener> listeners = new HashSet<>();
+    private final EventSource<LightOnEvent> onTurnOn = new EventSource<>();
+    private final EventSource<LightOffEvent> onTurnOff = new EventSource<>();
 
     public Light(String name) {
         this.name = name;
@@ -25,9 +26,7 @@ public class Light {
         if(!on) {
             on = true;
             LightOnEvent event = new LightOnEvent(this, System.currentTimeMillis());
-            for (LightListener listener : listeners) {
-                listener.handleLightOn(event);
-            }
+            onTurnOn.fire(event);
             LOG.info("Light {} turned on", name);
         }
     }
@@ -36,9 +35,7 @@ public class Light {
         if(on) {
             on = false;
             LightOffEvent event = new LightOffEvent(this, System.currentTimeMillis());
-            for (LightListener listener : listeners) {
-                listener.handleLightOff(event);
-            }
+            onTurnOff.fire(event);
             LOG.info("Light {} turned off", name);
         }
     }
@@ -59,13 +56,13 @@ public class Light {
         return !on;
     }
 
-    public Light addListener(LightListener listener) {
-        listeners.add(listener);
+    public Light onTurnOn(Consumer<LightOnEvent> listener) {
+        this.onTurnOn.add(listener);
         return this;
     }
 
-    public Light removeListener(LightListener listener) {
-        listeners.remove(listener);
+    public Light onTurnOff(Consumer<LightOffEvent> listener) {
+        this.onTurnOff.add(listener);
         return this;
     }
 }

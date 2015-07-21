@@ -1,4 +1,4 @@
-package be.everbuild.autosense.model.lightcontrol;
+package be.everbuild.autosense.model;
 
 import java.util.LinkedList;
 import java.util.List;

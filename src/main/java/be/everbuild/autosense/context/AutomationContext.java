@@ -1,11 +1,8 @@
-package be.everbuild.autosense;
+package be.everbuild.autosense.context;
 
-import be.everbuild.autosense.gpio.GpioAddress;
-import be.everbuild.autosense.gpio.GpioDriver;
-import be.everbuild.autosense.gpio.GpioPinAddress;
-import be.everbuild.autosense.model.Module;
-import be.everbuild.autosense.model.lightcontrol.LightControlModule;
-import be.everbuild.autosense.model.lightcontrol.button.Button;
+import be.everbuild.autosense.gpio.*;
+import be.everbuild.autosense.gpio.GpioModule;
+import be.everbuild.autosense.model.button.Button;
 import com.google.common.base.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +22,7 @@ public class AutomationContext {
     public long maxPressDuration = 1000;
 
     private final GpioDriver gpioDriver;
-    private final Map<GpioAddress, Module> modules = new HashMap<>();
+    private final Map<GpioAddress, GpioModule> modules = new HashMap<>();
 
     public AutomationContext(GpioDriver gpioDriver) {
         Preconditions.checkNotNull(gpioDriver, "gpioDriver");
@@ -68,7 +65,7 @@ public class AutomationContext {
     }
 
     public void bindButton(Button button, GpioPinAddress address) {
-        Module module = modules.get(address.getAddress());
+        GpioModule module = modules.get(address.getAddress());
         if(module instanceof LightControlModule) {
             ((LightControlModule)module).bindButton(button, address.getPin());
         } else if(module == null) {

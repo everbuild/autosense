@@ -1,7 +1,7 @@
-package be.everbuild.autosense.model;
+package be.everbuild.autosense.gpio;
 
 import be.everbuild.autosense.gpio.GpioAddress;
 
-public interface Module {
+public interface GpioModule {
     GpioAddress getAddress();
 }

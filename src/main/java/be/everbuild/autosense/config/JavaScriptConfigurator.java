@@ -1,5 +1,6 @@
-package be.everbuild.autosense;
+package be.everbuild.autosense.config;
 
+import be.everbuild.autosense.context.AutomationContext;
 import jdk.nashorn.api.scripting.NashornScriptEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,8 +14,8 @@ import java.nio.charset.Charset;
 /**
  * Created by Evert on 21/07/15.
  */
-public class Configurator {
-    private static final Logger log = LoggerFactory.getLogger(Configurator.class);
+public class JavaScriptConfigurator {
+    private static final Logger log = LoggerFactory.getLogger(JavaScriptConfigurator.class);
 
     private static final Charset CHARSET = Charset.forName("UTF-8");
 
@@ -22,11 +23,11 @@ public class Configurator {
     private final ScriptEngineManager scriptEngineManager;
     private final String configFilePath;
 
-    public Configurator(AutomationContext context) {
+    public JavaScriptConfigurator(AutomationContext context) {
         this(context, System.getProperty("config"));
     }
 
-    public Configurator(AutomationContext context, String configFilePath) {
+    public JavaScriptConfigurator(AutomationContext context, String configFilePath) {
         this.context = context;
         this.configFilePath = configFilePath != null ? configFilePath : getDefaultConfigPath();
         scriptEngineManager = new ScriptEngineManager();
@@ -55,7 +56,7 @@ public class Configurator {
     }
 
     private static void evalFromClasspath(ScriptEngine engine, String path) throws ScriptException {
-        try(InputStream stream = Configurator.class.getResourceAsStream(path)) {
+        try(InputStream stream = JavaScriptConfigurator.class.getResourceAsStream(path)) {
             eval(engine, stream, path);
         } catch (IOException e) {
             throw new RuntimeException(e);

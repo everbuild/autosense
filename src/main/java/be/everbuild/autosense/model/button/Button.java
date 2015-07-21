@@ -1,6 +1,6 @@
-package be.everbuild.autosense.model.lightcontrol.button;
+package be.everbuild.autosense.model.button;
 
-import be.everbuild.autosense.model.lightcontrol.EventSource;
+import be.everbuild.autosense.model.EventSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,8 +16,8 @@ public class Button {
     private final long maxPressDuration;
     private final ScheduledExecutorService executorService;
     private boolean pressed = false;
-    private final EventSource<ButtonEvent> onPress = new EventSource<>();
-    private final EventSource<ButtonEvent> onRelease = new EventSource<>();
+    private final EventSource<ButtonPressEvent> onPress = new EventSource<>();
+    private final EventSource<ButtonReleaseEvent> onRelease = new EventSource<>();
     private final Runnable autoReleaseTask = new AutoReleaseTask() ;
     private ScheduledFuture<?> autoReleaseFuture;
 
@@ -59,12 +59,12 @@ public class Button {
         }
     }
 
-    public Button onPress(Consumer<ButtonEvent> listener) {
+    public Button onPress(Consumer<ButtonPressEvent> listener) {
         this.onPress.add(listener);
         return this;
     }
 
-    public Button onRelease(Consumer<ButtonEvent> listener) {
+    public Button onRelease(Consumer<ButtonReleaseEvent> listener) {
         this.onRelease.add(listener);
         return this;
     }
