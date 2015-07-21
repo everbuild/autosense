@@ -1,5 +1,6 @@
 package be.everbuild.autosense.model.lightcontrol;
 
+import be.everbuild.autosense.gpio.GpioAddress;
 import be.everbuild.autosense.model.lightcontrol.button.Button;
 import be.everbuild.autosense.model.lightcontrol.light.Light;
 import org.slf4j.Logger;
@@ -8,16 +9,17 @@ import org.slf4j.LoggerFactory;
 public class BasicLightControlModule implements LightControlModule {
     private static final Logger LOG = LoggerFactory.getLogger(BasicLightControlModule.class);
 
-    protected final String id;
+    protected final GpioAddress address;
     protected final Button[] buttons = new Button[8];
     protected final Light[] lights = new Light[8];
 
-    public BasicLightControlModule(String id) {
-        this.id = id;
+    public BasicLightControlModule(GpioAddress address) {
+        this.address = address;
     }
 
-    public String getId() {
-        return id;
+    @Override
+    public GpioAddress getAddress() {
+        return address;
     }
 
     public void bindButton(Button button, int pin) {

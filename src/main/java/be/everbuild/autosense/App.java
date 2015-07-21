@@ -1,39 +1,24 @@
 package be.everbuild.autosense;
 
-import be.everbuild.autosense.config.Configuration;
-import be.everbuild.autosense.config.Configurator;
 import be.everbuild.autosense.gpio.GpioDriver;
-import be.everbuild.autosense.gpio.GpioDriverFactory;
 import be.everbuild.autosense.identity.Role;
 import be.everbuild.autosense.identity.SimpleIdentityManager;
-import be.everbuild.autosense.model.Model;
 import be.everbuild.autosense.server.Server;
-import com.google.gson.Gson;
-
-import java.io.FileReader;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 public class App {
+    // TODO auto-reload config file -- https://gist.github.com/hindol-viz/394ebc553673e2cd0699
+    // TODO extend config API to include lights etc
+    // TODO consider using Netty (+ some web lib) in stead of undertow
+    // TODO rest/ws API
+    // TODO front-end app
+    // TODO complete dummy GPIO driver (if even necessary, because frontend will be able to show state of lights, buttons...)
+    // TODO mobile app (consider phonegap/cordova)
+
     public static void main(String[] args) throws Exception {
-
-        Gson gson = new Gson();
-
-        Configuration config = gson.fromJson(new FileReader(System.getProperty("config")), Configuration.class);
-
-        startGpio(config);
+        GpioDriver gpioDriver = GpioDriver.create();
+        AutomationContext context = new AutomationContext(gpioDriver);
+        Configurator configurator = new Configurator(context);
         //startServer();
-    }
-
-    private static void startGpio(Configuration config) {
-        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-
-        String driverName = System.getProperty("driver", "real");
-        GpioDriver gpioDriver = GpioDriverFactory.create(driverName, executorService);
-
-        Configurator configurator = new Configurator(gpioDriver, executorService);
-
-        Model model = configurator.apply(config);
     }
 
     private static void startServer() {

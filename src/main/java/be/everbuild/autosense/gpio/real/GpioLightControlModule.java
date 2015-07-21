@@ -1,5 +1,6 @@
 package be.everbuild.autosense.gpio.real;
 
+import be.everbuild.autosense.gpio.GpioAddress;
 import be.everbuild.autosense.model.lightcontrol.BasicLightControlModule;
 import be.everbuild.autosense.model.lightcontrol.button.Button;
 import be.everbuild.autosense.model.lightcontrol.light.Light;
@@ -31,8 +32,6 @@ public class GpioLightControlModule extends BasicLightControlModule {
     private static final int INTCAPA    = 0x10;
     private static final int GPIOB      = 0x13;
 
-    private final int busNumber;
-    private final int address;
     private final ScheduledExecutorService executorService;
     private final SetupTask setupTask = new SetupTask();
     private ScheduledFuture<?> setupFuture;
@@ -41,10 +40,8 @@ public class GpioLightControlModule extends BasicLightControlModule {
     private boolean ready = false;
     private int currentOutputValue;
 
-    GpioLightControlModule(String id, int busNumber, int address, ScheduledExecutorService executorService) {
-        super(id);
-        this.busNumber = busNumber;
-        this.address = address;
+    public GpioLightControlModule(GpioAddress address, ScheduledExecutorService executorService) {
+        super(address);
         this.executorService = executorService;
         runSetupTask();
     }
@@ -61,10 +58,10 @@ public class GpioLightControlModule extends BasicLightControlModule {
     private void setup() throws IOException {
 
         // create I2C communications bus instance
-        bus = I2CFactory.getInstance(busNumber);
+        bus = I2CFactory.getInstance(address.getBus());
 
         // create I2C device instance
-        device = bus.getDevice(address);
+        device = bus.getDevice(address.getAddress());
 
         // port A = input
         device.write(IODIRA, (byte) 0xFF);
@@ -189,7 +186,7 @@ public class GpioLightControlModule extends BasicLightControlModule {
         public void run() {
             try {
                 if (!quiet) {
-                    LOG.info("setting up light control module on I2C bus {}, address {}", busNumber, Integer.toBinaryString(address));
+                    LOG.info("setting up light control module on I2C bus {}, address {}", address.getBus(), Integer.toBinaryString(address.getAddress()));
                 }
                 setup();
                 ready = true;

@@ -9,18 +9,12 @@ import java.util.Set;
 public class Light {
     private static final Logger LOG = LoggerFactory.getLogger(Light.class);
 
-    private final String id;
     private final String name;
     private boolean on = false;
     private final Set<LightListener> listeners = new HashSet<>();
 
-    public Light(String id, String name) {
-        this.id = id;
+    public Light(String name) {
         this.name = name;
-    }
-
-    public String getId() {
-        return id;
     }
 
     public String getName() {

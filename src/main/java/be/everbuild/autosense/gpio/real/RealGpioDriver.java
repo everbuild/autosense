@@ -1,5 +1,7 @@
 package be.everbuild.autosense.gpio.real;
 
+import be.everbuild.autosense.AutomationContext;
+import be.everbuild.autosense.gpio.GpioAddress;
 import be.everbuild.autosense.gpio.GpioDriver;
 import be.everbuild.autosense.model.lightcontrol.LightControlModule;
 import com.pi4j.gpio.extension.mcp.MCP23017GpioProvider;
@@ -13,15 +15,13 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.concurrent.ScheduledExecutorService;
 
-public class RealGpioDriver implements GpioDriver {
+public class RealGpioDriver extends GpioDriver {
     private static final Logger LOG = LoggerFactory.getLogger(RealGpioDriver.class);
 
-    private final ScheduledExecutorService executorService;
+    public static final String NAME = "real";
 
-    public RealGpioDriver(ScheduledExecutorService executorService) {
+    public RealGpioDriver() {
         // Mostly experiments for now
-
-        this.executorService = executorService;
 
         // create gpio controller instance
         final GpioController gpio = GpioFactory.getInstance();
@@ -130,7 +130,7 @@ public class RealGpioDriver implements GpioDriver {
     }
 
     @Override
-    public LightControlModule createLightControlModule(String id, int busNumber, int address) {
-        return new GpioLightControlModule(id, busNumber, address, executorService);
+    public LightControlModule createLightControlModule(GpioAddress address, ScheduledExecutorService executorService) {
+        return new GpioLightControlModule(address, executorService);
     }
 }

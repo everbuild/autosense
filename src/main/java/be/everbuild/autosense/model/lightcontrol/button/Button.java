@@ -1,35 +1,30 @@
 package be.everbuild.autosense.model.lightcontrol.button;
 
+import be.everbuild.autosense.model.lightcontrol.EventSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 public class Button {
     private static final Logger LOG = LoggerFactory.getLogger(Button.class);
 
-    private final String id;
     private final String name;
     private final long maxPressDuration;
     private final ScheduledExecutorService executorService;
     private boolean pressed = false;
-    private final Set<ButtonListener> listeners = new HashSet<>();
+    private final EventSource<ButtonEvent> onPress = new EventSource<>();
+    private final EventSource<ButtonEvent> onRelease = new EventSource<>();
     private final Runnable autoReleaseTask = new AutoReleaseTask() ;
     private ScheduledFuture<?> autoReleaseFuture;
 
-    public Button(String id, String name, long maxPressDuration, ScheduledExecutorService executorService) {
-        this.id = id;
+    public Button(String name, long maxPressDuration, ScheduledExecutorService executorService) {
         this.name = name;
         this.maxPressDuration = maxPressDuration;
         this.executorService = executorService;
-    }
-
-    public String getId() {
-        return id;
     }
 
     public String getName() {
@@ -45,9 +40,7 @@ public class Button {
             LOG.info("Button {} pressed", name);
             pressed = true;
             ButtonPressEvent event = new ButtonPressEvent(this, System.currentTimeMillis());
-            for (ButtonListener listener : listeners) {
-                listener.handleButtonPress(event);
-            }
+            onPress.fire(event);
             if (autoReleaseFuture != null && !autoReleaseFuture.isDone()) {
                 autoReleaseFuture.cancel(false);
             }
@@ -62,19 +55,17 @@ public class Button {
             LOG.info("Button {} released", name);
             pressed = false;
             ButtonReleaseEvent event = new ButtonReleaseEvent(this, System.currentTimeMillis());
-            for (ButtonListener listener : listeners) {
-                listener.handleButtonRelease(event);
-            }
+            onRelease.fire(event);
         }
     }
 
-    public Button addListener(ButtonListener listener) {
-        listeners.add(listener);
+    public Button onPress(Consumer<ButtonEvent> listener) {
+        this.onPress.add(listener);
         return this;
     }
 
-    public Button removeListener(ButtonListener listener) {
-        listeners.remove(listener);
+    public Button onRelease(Consumer<ButtonEvent> listener) {
+        this.onRelease.add(listener);
         return this;
     }
 
