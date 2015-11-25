@@ -1,5 +1,6 @@
 package be.everbuild.autosense.config;
 
+import be.everbuild.autosense.Shared;
 import be.everbuild.autosense.context.AutomationContext;
 import jdk.nashorn.api.scripting.NashornScriptEngine;
 import org.slf4j.Logger;
@@ -16,8 +17,6 @@ import java.nio.charset.Charset;
  */
 public class JavaScriptConfigurator {
     private static final Logger log = LoggerFactory.getLogger(JavaScriptConfigurator.class);
-
-    private static final Charset CHARSET = Charset.forName("UTF-8");
 
     private final AutomationContext context;
     private final ScriptEngineManager scriptEngineManager;
@@ -36,7 +35,7 @@ public class JavaScriptConfigurator {
     }
 
     private String getDefaultConfigPath() {
-        return (new File(new File(System.getProperty("user.home"), ".autosense"), "config")).getPath();
+        return (new File(Shared.HOME_FILE, "config.js")).getPath();
     }
 
     private void apply() {
@@ -73,6 +72,6 @@ public class JavaScriptConfigurator {
 
     private static void eval(ScriptEngine engine, InputStream stream, String filename) throws ScriptException {
         engine.put(ScriptEngine.FILENAME, filename);
-        engine.eval(new InputStreamReader(stream, CHARSET));
+        engine.eval(new InputStreamReader(stream, Shared.CHARSET));
     }
 }

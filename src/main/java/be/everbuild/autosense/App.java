@@ -6,8 +6,14 @@ import be.everbuild.autosense.gpio.GpioDriver;
 import be.everbuild.autosense.identity.Role;
 import be.everbuild.autosense.identity.SimpleIdentityManager;
 import be.everbuild.autosense.server.Server;
+import be.everbuild.autosense.vertx.MyVerticle;
+import io.vertx.core.Vertx;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class App {
+    private static final Logger log = LoggerFactory.getLogger(App.class);
+
     // TODO auto-reload config file -- https://gist.github.com/hindol-viz/394ebc553673e2cd0699
     // TODO extend config API to include lights etc
     // TODO consider using Netty (+ some web lib) in stead of undertow
@@ -21,6 +27,7 @@ public class App {
         AutomationContext context = new AutomationContext(gpioDriver);
         JavaScriptConfigurator configurator = new JavaScriptConfigurator(context);
         //startServer();
+        startVertxServer();
     }
 
     private static void startServer() {
@@ -29,5 +36,14 @@ public class App {
         Integer port = Integer.valueOf(System.getProperty("port", "80"));
         String host = System.getProperty("host", "localhost");
         new Server(host, port, identityManager).start();
+    }
+
+    private static void startVertxServer() {
+        Vertx vertx = Vertx.vertx();
+        vertx.deployVerticle(new MyVerticle());
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            log.info("Stopping vertx");
+            vertx.close();
+        }));
     }
 }
